@@ -1,7 +1,7 @@
 #pragma once
 
-#if PROJ_VERSION_MAJOR < 4 || PROJ_VERSION_MAJOR > 5
-#error "proj version 4 or 5 required"
+#if PROJ_VERSION_MAJOR < 8 
+#error "proj version 8 required"
 #endif
 
 #include <map>
@@ -9,7 +9,7 @@
 #include <tuple>
 #include <vector>
 
-#include <proj_api.h>
+#include <proj.h>
 
 class Proj {
 public:
@@ -24,5 +24,5 @@ public:
   std::tuple<double, double> inv(double x, double y);
 
 protected:
-  projPJ proj_;
+  PJ * proj_;
 };

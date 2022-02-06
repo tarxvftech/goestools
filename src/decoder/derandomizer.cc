@@ -1,6 +1,7 @@
 #include "derandomizer.h"
 
 #include <util/error.h>
+#include <stddef.h>
 
 namespace decoder {
 

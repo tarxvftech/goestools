@@ -17,9 +17,12 @@ std::vector<std::string> toVector(
   return vargs;
 }
 
-std::string pj_error(std::string prefix = "proj: ") {
+std::string pj_error(
+    PJ * proj_,
+    std::string prefix = "proj: "
+    ) {
   std::stringstream ss;
-  ss << prefix << pj_strerrno(pj_errno);
+  ss << prefix << proj_errno_string(proj_errno(proj_));
   return ss.str();
 }
 
@@ -30,9 +33,9 @@ Proj::Proj(const std::vector<std::string>& args) {
   for (const auto& arg : args) {
     argv.push_back(strdup(arg.c_str()));
   }
-  proj_ = pj_init(argv.size(), argv.data());
+  proj_ = proj_create_argv(0, argv.size(), argv.data());
   if (!proj_) {
-    throw std::runtime_error(pj_error("proj initialization error: "));
+    throw std::runtime_error(pj_error(proj_, "proj initialization error: "));
   }
   for (auto& arg : argv) {
     free(arg);
@@ -44,17 +47,17 @@ Proj::Proj(const std::map<std::string, std::string>& args)
 }
 
 Proj::~Proj() {
-  pj_free(proj_);
+  proj_destroy(proj_);
 }
 
 std::tuple<double, double> Proj::fwd(double lon, double lat) {
-  projUV in = { lon, lat };
-  projXY out = pj_fwd(in, proj_);
-  return std::make_tuple<double, double>(std::move(out.u), std::move(out.v));
+  PJ_COORD in = { lon, lat };
+  PJ_COORD out = proj_trans( proj_, PJ_FWD, in);
+  return std::make_tuple<double, double>(std::move(out.xy.x), std::move(out.xy.y));
 }
 
 std::tuple<double, double> Proj::inv(double x, double y) {
-  projXY in = { x, y };
-  projUV out = pj_inv(in, proj_);
-  return std::make_tuple<double, double>(std::move(out.u), std::move(out.v));
+  PJ_COORD in = { x, y };
+  PJ_COORD out = proj_trans( proj_, PJ_INV, in);
+  return std::make_tuple<double, double>(std::move(out.uv.u), std::move(out.uv.v));
 }

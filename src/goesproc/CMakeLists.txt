@@ -20,7 +20,7 @@ set(GOESPROC_SRCS
   )
 
 find_package(PkgConfig)
-pkg_check_modules(OPENCV REQUIRED opencv)
+pkg_check_modules(OPENCV REQUIRED opencv4)
 pkg_check_modules(PROJ proj)
 
 if(PROJ_FOUND)
@@ -55,3 +55,4 @@ if(PROJ_FOUND)
   target_compile_definitions(goesproc PRIVATE HAS_PROJ)
   target_link_libraries(goesproc proj)
 endif()
+
